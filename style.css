@@ -1,1 +1,4 @@
-
+body {
+  background-color: #333; /*Dark gray*/
+  color: #eee /* Light text color for constrast*/
+}
