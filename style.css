@@ -14,6 +14,15 @@ a {
   color: #87CEEB;
 }
 
+a {
+  color: #87CEEB;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
 button {
   color: #eee;
   background-color: #007bff;
@@ -22,4 +31,8 @@ button {
   border-radius: 5px;
   cursor: pointer;
   font-family: 'Roboto', sans-serif;
+}
+
+button:hover {
+  background-color: #0056b3;
 }
