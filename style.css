@@ -1,10 +1,25 @@
 body {
   background-color: #333; /*Dark gray*/
-  color: #eee /* Light text color for constrast*/
+  color: #eee; /* Light text color for constrast*/
 
   font-family: 'Open Sans', sans-serif;
 }
 
-h1 {
+h1, h2, h3, h4, h5, h6 {
+  color: #eee;
+  font-family: 'Roboto', sans-serif;
+}
+
+a {
+  color: #87CEEB;
+}
+
+button {
+  color: #eee;
+  background-color: #007bff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
   font-family: 'Roboto', sans-serif;
 }
