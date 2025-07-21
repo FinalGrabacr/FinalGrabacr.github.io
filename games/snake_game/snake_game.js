@@ -148,14 +148,6 @@ class SnakeGame {
             this.score++;
             this.scoreDisplay.textContent = this.score;
             this._generateFood(); // Generate new food
-
-            // Speed up game (optional, makes it harder over time)
-            if (this.gameSpeed > 50) { // Don't go below 50ms
-                this.gameSpeed -= 5; // Decrease interval by 5ms
-                clearInterval(this.gameInterval); // Clear current interval
-                this.gameInterval = setInterval(() => this.gameLoop(), this.gameSpeed); // Start new, faster interval
-                console.log("Game speed increased to:", this.gameSpeed);
-            }
         } else {
             this.snake.pop(); // Remove tail if no food eaten (snake moves but doesn't grow)
             console.log("Snake after pop:", JSON.stringify(this.snake));
