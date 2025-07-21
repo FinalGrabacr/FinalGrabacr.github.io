@@ -1,59 +1,53 @@
+/* General body styles - KEEP THESE or adjust as needed */
 body {
-  background-color: #333; /*Dark gray*/
-  color: #eee; /* Light text color for constrast*/
-  font-family: 'Open Sans', sans-serif;
-  padding-top: 70px;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  color: #eee;
+  background-color: #333; /* Dark gray */
+  color: #eee;          /* Default light text color for body */
   font-family: 'Roboto', sans-serif;
+  margin: 0; /* Remove default body margin */
+  /* Remove padding-top here, as the nav will push content down */
 }
 
-a {
-  color: #87CEEB;
+/* --- NEW NAVIGATION STYLES --- */
+.main-nav {
+  background-color: #2a2a2a; /* Slightly darker than body */
+  padding: 15px 20px;
+  display: flex; /* Use Flexbox to arrange items horizontally */
+  justify-content: flex-start; /* Align items to the start */
+  gap: 20px; /* Space between navigation items */
+  width: 100%; /* Make nav span full width */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); /* Subtle shadow */
+  position: sticky; /* Make it sticky at the top if you scroll */
+  top: 0;
+  z-index: 1000; /* Ensure it stays on top of other content */
 }
 
-a {
-  color: #87CEEB;
+.nav-button {
+  color: #87CEEB; /* Light blue, consistent with your game's button */
   text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
-}
-
-button {
-  color: #eee;
-  background-color: #007bff;
-  border: none;
-  padding: 10px 20px;
+  font-weight: bold;
+  font-size: 1.1em;
+  padding: 5px 10px;
   border-radius: 5px;
-  cursor: pointer;
-  font-family: 'Roboto', sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  display: flex; /* To align icon and text nicely */
+  align-items: center;
+  gap: 5px; /* Space between icon and text */
 }
 
-button:hover {
-  background-color: #0056b3;
+.nav-button:hover {
+  background-color: rgba(135, 206, 235, 0.2); /* Light blue background on hover */
+  color: #fff; /* White text on hover */
 }
 
-.home-button {
-  position: fixed;
-  top: 15px;
-  left: 15px;
-  font-size: 24px;
-  color: #87CEEB;
-  background-color: transparent;
-  padding: 10px;
-  border-radius: 5px;
-  text-decoration: none;
-  z-index: 1000;
+/* Ensure content below the nav bar doesn't get hidden */
+.content {
+  padding: 20px; /* Add some padding to your main content */
+  width: 100%; /* Or max-width to center it */
+  box-sizing: border-box; /* Include padding in width */
 }
 
-.home-button:hover {
-  color: #4CAF50;
-  text-decoration: none;
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-
+/* Remove or comment out your old .home-button styles if they exist */
+/* .home-button {
+    position: fixed; // REMOVE THIS
+    // ...
+} */
