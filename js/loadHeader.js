@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    const repoName = "FinalGrabacr.github.io";
+    const repoName = "";
 
     const baseURL = window.location.origin + (repoName ? '/' + repoName : '');
 
