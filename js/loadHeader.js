@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const baseURL = window.location.origin + (repoName ? '/' + repoName : '');
 
-    fetch(baseURL + '/_header.html')
+    fetch(baseURL + '/header.html')
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
