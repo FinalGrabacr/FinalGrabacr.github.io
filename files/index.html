@@ -12,26 +12,53 @@
   <link rel="stylesheet" href="../style.css">
 </head>
 <body>
-
-  <nav class="main-nav">
-    <a href="../" class="nav-button">
-      <i class="fas fa-home"></i> Home
-    </a>
-    <a href="../games/" class="nav-button">
-      Games
-    </a>
-    <a href="./" class="nav-button">
-      My Files
-    </a>
-    <a href = "../algo_visualizer/" class="nav-button" >
-      Algorithms
-    </a>
-  </nav>
-
-  <div class="content">
-    <h1>My Files</h1>
-    <p>This is where my files content will go.</p>
+<div id="header-placeholder"></div>
+<div class="content">
+  <h1>Files</h1>
+  <div class="table-responsive">
+    <table class="file-table">
+      <thead>
+      <tr>
+        <th>File Name</th>
+        <th>Type</th>
+        <th>Size</th>
+        <th>Date Added</th>
+        <th></th> </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td><i class="fas fa-file-pdf file-icon pdf-color"></i> <a href="my_project_report.pdf" download>My Project Report.pdf</a></td>
+        <td>PDF</td>
+        <td>1.2 MB</td>
+        <td>2024-01-15</td>
+        <td><a href="my_project_report.pdf" download title="Download"><i class="fas fa-download action-icon"></i></a></td>
+      </tr>
+      <tr>
+        <td><i class="fas fa-file-word file-icon doc-color"></i> <a href="meeting_notes.docx" download>Meeting Notes.docx</a></td>
+        <td>DOCX</td>
+        <td>345 KB</td>
+        <td>2024-02-01</td>
+        <td><a href="meeting_notes.docx" download title="Download"><i class="fas fa-download action-icon"></i></a></td>
+      </tr>
+      <tr>
+        <td><i class="fas fa-file-image file-icon img-color"></i> <a href="sample_photo.jpg" target="_blank" title="View Image">Sample Photo.jpg</a></td>
+        <td>JPG</td>
+        <td>2.5 MB</td>
+        <td>2024-03-10</td>
+        <td><a href="sample_photo.jpg" target="_blank" title="View"><i class="fas fa-eye action-icon"></i></a></td>
+      </tr>
+      <tr>
+        <td><i class="fas fa-file-archive file-icon zip-color"></i> <a href="project_archive.zip" download>Project Archive.zip</a></td>
+        <td>ZIP</td>
+        <td>10.1 MB</td>
+        <td>2024-04-05</td>
+        <td><a href="project_archive.zip" download title="Download"><i class="fas fa-download action-icon"></i></a></td>
+      </tr>
+      </tbody>
+    </table>
   </div>
 
+</div>
+<script src="../js/loadHeader.js" defer></script>
 </body>
 </html>

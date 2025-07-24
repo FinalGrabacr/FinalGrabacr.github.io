@@ -1,53 +1,146 @@
-/* General body styles - KEEP THESE or adjust as needed */
 body {
-  background-color: #333; /* Dark gray */
-  color: #eee;          /* Default light text color for body */
+  background-color: #333;
+  color: #eee;
   font-family: 'Roboto', sans-serif;
-  margin: 0; /* Remove default body margin */
-  /* Remove padding-top here, as the nav will push content down */
+  margin: 0;
 }
 
-/* --- NEW NAVIGATION STYLES --- */
+
 .main-nav {
-  background-color: #2a2a2a; /* Slightly darker than body */
+  background-color: #2a2a2a;
   padding: 15px 20px;
-  display: flex; /* Use Flexbox to arrange items horizontally */
-  justify-content: flex-start; /* Align items to the start */
-  gap: 20px; /* Space between navigation items */
-  width: 100%; /* Make nav span full width */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); /* Subtle shadow */
-  position: sticky; /* Make it sticky at the top if you scroll */
+  display: flex;
+  justify-content: flex-start;
+  gap: 20px;
+  width: 100%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  position: sticky;
   top: 0;
-  z-index: 1000; /* Ensure it stays on top of other content */
+  z-index: 1000;
 }
 
 .nav-button {
-  color: #87CEEB; /* Light blue, consistent with your game's button */
+  color: #87CEEB;
   text-decoration: none;
   font-weight: bold;
   font-size: 1.1em;
   padding: 5px 10px;
   border-radius: 5px;
   transition: background-color 0.3s ease, color 0.3s ease;
-  display: flex; /* To align icon and text nicely */
+  display: flex;
   align-items: center;
-  gap: 5px; /* Space between icon and text */
+  gap: 5px;
 }
 
 .nav-button:hover {
-  background-color: rgba(135, 206, 235, 0.2); /* Light blue background on hover */
-  color: #fff; /* White text on hover */
+  background-color: rgba(135, 206, 235, 0.2);
+  color: #fff;
 }
 
-/* Ensure content below the nav bar doesn't get hidden */
 .content {
-  padding: 20px; /* Add some padding to your main content */
-  width: 100%; /* Or max-width to center it */
-  box-sizing: border-box; /* Include padding in width */
+  padding: 20px;
 }
 
-/* Remove or comment out your old .home-button styles if they exist */
-/* .home-button {
-    position: fixed; // REMOVE THIS
-    // ...
-} */
+.file-list-container {
+  max-width: 900px; /* Limit table width for readability */
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.file-list-container h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #333;
+  font-size: 2.2em;
+  font-weight: 700;
+}
+
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 10px;
+}
+
+.file-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 0.95em;
+  line-height: 1.5;
+}
+
+.file-table th,
+.file-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.file-table th {
+  background-color: #eef2f7;
+  color: #555;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.file-table tbody tr:nth-child(even) {
+  background-color: #f6f6f6;
+}
+
+.file-table tbody tr:hover {
+  background-color: #e0f2f7;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.file-table td a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.file-table td a:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+.file-icon {
+  margin-right: 8px;
+  font-size: 1.1em;
+  vertical-align: middle;
+}
+
+.pdf-color { color: #dc3545;}
+.doc-color { color: #007bff;}
+.img-color { color: #28a745;}
+.zip-color { color: #ffc107;}
+
+
+.action-icon {
+  font-size: 1.2em;
+  color: #6c757d;
+  transition: color 0.3s ease;
+}
+
+.action-icon:hover {
+  color: #343a40;
+}
+
+@media (max-width: 768px) {
+  .file-list-container {
+    margin: 20px;
+    padding: 15px;
+  }
+  .file-table {
+    font-size: 0.9em;
+  }
+  .file-table th,
+  .file-table td {
+    padding: 10px 12px;
+  }
+}
