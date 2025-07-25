@@ -1,3 +1,11 @@
+html {
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit; /* All elements will include padding and border in their width/height */
+}
+
 body {
   background-color: #333;
   color: #eee;
