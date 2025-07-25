@@ -3,47 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wordle Load Test</title>
+    <title>Wordle</title>
+    <style>
+        /* Basic styles for visualization */
+        body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; margin-top: 50px; }
+        #game-area { border: 1px solid #ccc; padding: 20px; text-align: center; }
+        #message-display { margin-top: 10px; font-weight: bold; color: #4CAF50; min-height: 20px; }
+        #guess-input { padding: 8px; font-size: 1.2em; text-align: center; width: 200px; margin-bottom: 10px; }
+        #submit-button { padding: 10px 15px; background-color: #4CAF50; color: white; border: none; cursor: pointer; border-radius: 5px; }
+
+        /* Grid styles */
+        #game-grid { display: flex; flex-direction: column; gap: 5px; margin-bottom: 20px; }
+        .wordle-row { display: flex; gap: 5px; justify-content: center; }
+        .wordle-cell {
+            width: 50px; /* Adjust size as needed */
+            height: 50px;
+            border: 2px solid #555;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2em;
+            font-weight: bold;
+            text-transform: uppercase;
+            background-color: #222;
+            color: white;
+        }
+
+        /* --- CSS for the 'shake' animation --- */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+            20%, 40%, 60%, 80% { transform: translateX(10px); }
+        }
+
+        .shake {
+            animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both;
+            transform: translate3d(0, 0, 0); /* Improves performance */
+            backface-visibility: hidden; /* Improves performance */
+            perspective: 1000px; /* Improves performance */
+        }
+    </style>
 </head>
 <body>
-<h1>Wordle Word Loading Test</h1>
-<p id="status-message">Initializing test...</p>
+<div id="game-area">
+    <div id="game-grid">
+    </div>
+    <input type="text" id="guess-input" maxlength="5">
+    <button id="submit-button">Guess</button>
+    <p id="message-display"></p>
+</div>
 
-<script src="wordleGame.js"></script>
+<script src="wordle.js"></script>
 
 <script>
-    // Test execution code
     document.addEventListener('DOMContentLoaded', async () => {
-        const statusMessage = document.getElementById('status-message');
-
         const gameConfig = {
-            // Adjust this path based on where 'test.html' is relative to 'words.txt'
-            // If words.txt is in the same directory as this test.html: 'words.txt'
-            // If words.txt is in the parent directory: '../words.txt'
-            // If words.txt is in 'your_website_root/games/wordle/words.txt'
-            // AND this test.html is also in 'your_website_root/games/wordle/': 'words.txt'
-            wordListPath: 'words.txt', // <--- Adjust this path if necessary!
+            wordListPath: 'words.txt', // Path relative to this HTML file
             wordLength: 5,
             maxGuesses: 6
         };
 
         const wordle = new Wordle(gameConfig);
 
-        statusMessage.textContent = "Attempting to load words...";
+        const wordsLoadedSuccessfully = await wordle.loadWords();
 
-        try {
-            const wordsLoadedSuccessfully = await wordle.loadWords();
-
-            if (wordsLoadedSuccessfully) {
-                statusMessage.textContent = "Word list loaded. Initializing game to pick a word...";
-                wordle.initializeGame(); // This will pick and log the word of the day
-                statusMessage.textContent = "Word picked! Check your browser's console (F12) for the word.";
-            } else {
-                statusMessage.textContent = "Failed to load words. Check console for errors.";
-            }
-        } catch (error) {
-            statusMessage.textContent = "An unexpected error occurred during loading. Check console.";
-            console.error("Test execution error:", error);
+        if (wordsLoadedSuccessfully) {
+            wordle.initializeGame();
+        } else {
+            console.error("Game cannot start because word list failed to load.");
         }
     });
 </script>
