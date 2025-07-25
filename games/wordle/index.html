@@ -5,46 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wordle</title>
     <style>
+        /* Base styles - Emulating Wordle's dark theme */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Helvetica Neue', Arial, sans-serif; /* Closer to Wordle's font */
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start; /* Align content to the top */
-            min-height: 100vh; /* Full viewport height */
-            background-color: #1a1a1b; /* Dark background similar to Wordle */
-            color: #d3d6da; /* Light gray text for contrast */
+            justify-content: flex-start;
+            min-height: 100vh;
+            background-color: #1a1a1b; /* Wordle dark background */
+            color: #d7dadc; /* Wordle light text */
             margin: 0;
-            padding: 20px; /* Add some padding around the content */
-            box-sizing: border-box; /* Include padding in element's total width and height */
+            padding: 20px 0; /* Padding top/bottom, no side padding for full width game */
+            box-sizing: border-box;
+            overflow-y: auto; /* Allow scrolling if content exceeds height */
         }
 
         h1 {
-            color: #d3d6da;
+            font-size: 2.5em; /* Larger title */
+            color: #d7dadc;
             margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 1px solid #3a3a3c; /* Subtle separator */
+            padding-bottom: 10px;
+            width: 100%;
+            max-width: 500px; /* Aligns with keyboard width */
+            text-align: center;
         }
 
         #game-area {
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 100%; /* Take full width */
-            max-width: 500px; /* Max width for the game area */
-            margin-bottom: 20px; /* Space between game and keyboard */
+            width: 100%;
+            max-width: 350px; /* Wordle grid is narrower */
+            margin-bottom: 20px;
+            /* No padding here, gap for cells provides spacing */
         }
 
         #game-grid {
             display: grid;
-            grid-template-rows: repeat(6, 1fr); /* 6 rows for guesses */
-            gap: 5px; /* Space between rows */
+            grid-template-rows: repeat(6, 1fr);
+            gap: 5px; /* Space between rows and cells */
             width: 100%;
-            padding: 10px; /* Padding inside the grid container */
             box-sizing: border-box;
         }
 
         .grid-row {
             display: grid;
-            grid-template-columns: repeat(5, 1fr); /* 5 columns for letters */
+            grid-template-columns: repeat(5, 1fr);
             gap: 5px; /* Space between cells */
             width: 100%;
         }
@@ -53,58 +63,73 @@
             width: 100%;
             padding-bottom: 100%; /* Makes cells square based on width */
             position: relative;
-            background-color: #3a3a3c; /* Default cell background (dark gray) */
-            border: 2px solid #3a3a3c; /* Default border */
+            background-color: #1a1a1b; /* Default cell background */
+            border: 2px solid #3a3a3c; /* Default border (dark gray) */
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2em;
+            font-size: 2em; /* Adjusted font size */
             font-weight: bold;
             text-transform: uppercase;
             box-sizing: border-box;
-            color: #d3d6da;
-            transition: background-color 0.6s ease-out, border-color 0.6s ease-out; /* Smooth transition for colors */
+            color: #d7dadc; /* Default text color */
+            transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out; /* Faster transitions for reveal */
         }
 
-        .grid-cell span {
-            position: absolute; /* Center content within padded cell */
+        /* Border for cells that have a letter typed in them */
+        .grid-cell.filled {
+            border-color: #565758; /* Lighter border for typed letters */
+        }
+
+        .grid-cell span { /* Keep the span for content placement */
+            position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
         }
 
-        /* Cell result colors */
+        /* Cell result colors (Wordle's exact palette) */
         .correct {
             background-color: #538d4e; /* Green */
             border-color: #538d4e;
+            color: #ffffff; /* White text for colored cells */
         }
 
         .present {
             background-color: #b59f3b; /* Yellow/Orange */
             border-color: #b59f3b;
+            color: #ffffff;
         }
 
         .absent {
-            background-color: #3a3a3c; /* Dark gray (default for absent) */
+            background-color: #3a3a3c; /* Dark gray */
             border-color: #3a3a3c;
+            color: #ffffff;
         }
 
+        /* Message Display */
         #message-display {
             margin-top: 20px;
-            font-size: 1.2em;
+            font-size: 1.1em;
             font-weight: bold;
             min-height: 1.5em; /* Reserve space for messages */
-            color: #d3d6da; /* Default message color */
+            color: #d7dadc; /* Default message color */
+            text-align: center;
+            width: 100%;
+            max-width: 400px; /* Max width for message pop-ups */
         }
 
+        /* Keyboard styles */
         #keyboard {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 8px; /* Space between keyboard rows */
             width: 100%;
-            max-width: 600px; /* Adjust as needed */
+            max-width: 500px; /* Wordle keyboard is slightly wider than the grid */
             margin-top: 20px;
+            padding: 0 8px; /* Slight padding on sides to keep keys off edge */
+            box-sizing: border-box;
         }
 
         .keyboard-row {
@@ -115,37 +140,38 @@
         }
 
         .keyboard-button {
-            background-color: #818384; /* Key background (gray) */
-            color: #d3d6da; /* Key text color */
+            background-color: #818384; /* Default key background (light gray) */
+            color: #d7dadc; /* Key text color (whiteish, matches grid default) */
             border: none;
-            border-radius: 4px;
-            padding: 15px 10px; /* Adjust padding for key size */
+            border-radius: 4px; /* Slightly rounded corners */
+            padding: 0; /* Remove padding, let height/min-width define size */
             font-size: 1.1em;
             font-weight: bold;
             text-transform: uppercase;
             cursor: pointer;
             flex-grow: 1; /* Keys in a row will grow to fill space */
             flex-basis: 0; /* Base size for flex-grow */
-            min-width: 30px; /* Minimum width for small keys */
+            min-width: 30px; /* Base width for letter keys */
             height: 58px; /* Fixed height for consistency */
-            display: flex; /* For centering text */
+            display: flex; /* For centering text/SVG */
             align-items: center;
             justify-content: center;
-            transition: background-color 0.2s ease;
+            transition: background-color 0.2s ease, color 0.2s ease; /* Smooth transition for key colors */
+            -webkit-user-select: none; /* Prevent text selection on keys */
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         .keyboard-button:hover {
             background-color: #929394; /* Lighter gray on hover */
         }
 
-        .keyboard-button:active {
-            background-color: #6d6e6f; /* Even darker on active */
-        }
-
+        /* Specific size for 'big' buttons (Enter/Backspace) */
         .big-button {
-            flex-grow: 1.5; /* Enter and Backspace can be wider */
+            flex-grow: 1.5; /* Wider than regular keys */
             min-width: 60px; /* Minimum width for big buttons */
-            font-size: 0.9em; /* Slightly smaller text for big buttons */
+            font-size: 0.9em; /* Slightly smaller text for big buttons, if text is used */
         }
 
         /* Keyboard key colors based on guess results */
@@ -163,6 +189,14 @@
             background-color: #3a3a3c; /* Dark gray */
             color: #ffffff;
         }
+
+        /* SVG icon styling within buttons */
+        .keyboard-button svg {
+            fill: currentColor; /* Use button's text color for SVG */
+            width: 24px; /* Icon size */
+            height: 24px;
+        }
+
     </style>
 </head>
 <body>
@@ -170,8 +204,6 @@
 <div id="game-area">
     <div id="game-grid">
     </div>
-    <input type="text" id="guess-input" maxlength="5" style="display:none;">
-    <button id="submit-button" style="display:none;">Guess</button>
     <p id="message-display"></p>
 </div>
 
@@ -181,21 +213,16 @@
 <script>
     document.addEventListener('DOMContentLoaded', async () => {
         const gameConfig = {
-            // wordListPath: 'words.txt', // This line is no longer needed after embedding word list
             wordLength: 5,
             maxGuesses: 6
         };
 
         const wordle = new Wordle(gameConfig);
-
-        // Since loadWords is now synchronous due to embedded list, 'await' is technically not strictly required
-        // but keeping it doesn't hurt and allows for easy reversion if you go back to fetching.
         const wordsLoadedSuccessfully = await wordle.loadWords();
 
         if (wordsLoadedSuccessfully) {
             wordle.initializeGame();
         } else {
-            // This path should ideally not be hit if the word list is embedded
             console.error("Game cannot start because word list failed to load.");
         }
     });

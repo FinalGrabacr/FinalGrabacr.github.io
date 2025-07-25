@@ -407,10 +407,7 @@ class Wordle {
     }
 
     async loadWords() {
-        // With the word list embedded, we just need to ensure it's ready.
-        // The filter for wordLength happens in the constructor's definition for wordList.
-        // We can optionally re-filter here if wordLength might change dynamically,
-        // but for a fixed Wordle, it's usually set once.
+        // With the word list embedded, we just filter it.
         this.wordList = this.wordList.filter(word => word.length === this.wordLength && word.length > 0);
         console.log(`Word list loaded (embedded): ${this.wordList.length} words of length ${this.wordLength}.`);
         return true; // Always succeeds as it's not fetching
@@ -439,8 +436,6 @@ class Wordle {
         this.resetLetterStates();
         this.createGameGrid();
         this.createKeyboard();
-        // Focus the input if it were visible, but it's hidden now.
-        // this.guessInput.focus();
     }
 
     handleKeyPress(key) {
@@ -453,21 +448,22 @@ class Wordle {
         if (key === 'backspace') {
             if (currentCellIndex > 0) {
                 currentGuess[currentCellIndex - 1] = '';
-                this.updateGridCell(this.currentRow, currentCellIndex - 1, '');
+                this.updateGridCell(this.currentRow, currentCellIndex - 1, '', false); // Remove letter, remove filled class
             }
         } else if (key === 'enter') {
             this.handleGuess();
         } else if (key.length === 1 && key.match(/[a-z]/i)) {
             if (currentCellIndex < this.wordLength) {
                 currentGuess[currentCellIndex] = key.toLowerCase();
-                this.updateGridCell(this.currentRow, currentCellIndex, key.toLowerCase());
+                this.updateGridCell(this.currentRow, currentCellIndex, key.toLowerCase(), true); // Add letter, add filled class
             }
         }
     }
 
     handlePhysicalKeyPress(event) {
         // Prevent default behavior for some keys (e.g., spacebar scrolling)
-        if (event.key === 'Backspace' || event.key === 'Enter' || event.key.length === 1 && event.key.match(/[a-z]/i)) {
+        // Also prevent typing the key into other elements if focus accidentally shifts
+        if (event.key === 'Backspace' || event.key === 'Enter' || (event.key.length === 1 && event.key.match(/[a-z]/i))) {
             event.preventDefault();
         }
         this.handleKeyPress(event.key.toLowerCase());
@@ -506,9 +502,10 @@ class Wordle {
     displayMessage(message, isFinal = false) {
         this.messageDisplay.textContent = message;
         if (isFinal) {
-            this.messageDisplay.style.color = '#538d4e'; // Green for win/loss
+            this.messageDisplay.style.color = '#d7dadc'; // Keep white for final messages
+            // Could add an animation class here if desired for pop-up effect
         } else {
-            this.messageDisplay.style.color = '#d3d6da'; // Default light gray
+            this.messageDisplay.style.color = '#d7dadc'; // Default light gray
         }
     }
 
@@ -533,12 +530,17 @@ class Wordle {
         }
     }
 
-    updateGridCell(row, col, letter) {
+    updateGridCell(row, col, letter, isFilled) {
         const rowElement = this.gameGrid.children[row];
         if (rowElement) {
             const cellElement = rowElement.children[col];
             if (cellElement) {
                 cellElement.querySelector('span').textContent = letter.toUpperCase();
+                if (isFilled) {
+                    cellElement.classList.add('filled');
+                } else {
+                    cellElement.classList.remove('filled');
+                }
             }
         }
     }
@@ -549,6 +551,8 @@ class Wordle {
             const cells = rowElement.children;
             letterColors.forEach((lc, index) => {
                 const cell = cells[index];
+                // Remove the 'filled' class once colors are applied
+                cell.classList.remove('filled');
                 // Remove previous state classes, if any
                 cell.classList.remove('correct', 'present', 'absent');
                 // Add the new state class
@@ -571,6 +575,20 @@ class Wordle {
             'zxcvbnm'
         ];
 
+        // Define SVG icons with fill="currentColor" (will use the button's text color)
+        const enterIcon = `
+            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
+                <path fill="currentColor" d="M19 7v4H5.83l3.58-3.59L8 6l-6 6 6 6 1.41-1.41L5.83 13H21V7z"/>
+            </svg>
+        `; // Material Design "reply" icon, commonly used for enter
+
+        const backspaceIcon = `
+            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
+                <path fill="currentColor" d="M22 3H7c-.69 0-1.23.35-1.59.88L1 12l4.41 8.12c.36.53.9.88 1.59.88h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-3 12.59L17.59 14 14 10.41 10.41 14 9 12.59 12.59 9 9 5.41 10.41 4 14 7.59 17.59 4 19 5.41 15.41 9 19 12.59z"/>
+            </svg>
+        `; // Material Design "backspace" icon
+
+
         rows.forEach((rowLetters, index) => {
             const rowDiv = document.createElement('div');
             rowDiv.classList.add('keyboard-row');
@@ -578,7 +596,7 @@ class Wordle {
             // Add Enter button to the last row
             if (index === rows.length - 1) {
                 const enterButton = document.createElement('button');
-                enterButton.textContent = 'ENTER'; // Text, not icon
+                enterButton.innerHTML = enterIcon; // Use the SVG icon
                 enterButton.classList.add('keyboard-button', 'big-button');
                 enterButton.dataset.key = 'enter';
                 rowDiv.appendChild(enterButton);
@@ -596,7 +614,7 @@ class Wordle {
             // Add Backspace button to the last row
             if (index === rows.length - 1) {
                 const backspaceButton = document.createElement('button');
-                backspaceButton.textContent = 'BACKSPACE'; // Text, not icon
+                backspaceButton.innerHTML = backspaceIcon; // Use the SVG icon
                 backspaceButton.classList.add('keyboard-button', 'big-button');
                 backspaceButton.dataset.key = 'backspace';
                 rowDiv.appendChild(backspaceButton);
@@ -608,9 +626,10 @@ class Wordle {
         // Add event listener to the keyboard container (event delegation)
         this.keyboardContainer.addEventListener('click', (event) => {
             const target = event.target;
-            // Check if the clicked element is a keyboard-button
-            if (target.classList.contains('keyboard-button')) {
-                const key = target.dataset.key;
+            // Use closest() to find the button, even if the SVG path was clicked
+            const button = target.closest('.keyboard-button');
+            if (button) {
+                const key = button.dataset.key;
                 this.handleKeyPress(key); // Call the unified handler
             }
         });
