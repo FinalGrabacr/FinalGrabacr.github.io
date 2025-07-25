@@ -92,22 +92,22 @@
     </style>
 </head>
 <body>
-<a href="./" class="home-button">
-    <i class="fas fa-home"></i>
-</a>
 
-<h1>Snake Game</h1>
+    <div id="header-placeholder"></div>
 
-<div id="game-container">
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
-</div>
+    <h1>Snake Game</h1>
 
-<div id="game-info">
-    <p>Use arrow keys to play!</p>
-    <p>Score: <span id="score">0</span></p>
-    <button id="startButton">Start Game</button>
-</div>
+    <div id="game-container">
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+    </div>
 
-<script src="snake_game.js" defer></script>
+    <div id="game-info">
+        <p>Use arrow keys to play!</p>
+        <p>Score: <span id="score">0</span></p>
+        <button id="startButton">Start Game</button>
+    </div>
+
+    <script src="snake_game.js" defer></script>
+    <script src="../../js/loadheader.js" defer></script>
 </body>
 </html>
