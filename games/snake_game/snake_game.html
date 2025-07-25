@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Snake Game</title>
 
-    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+    <link rel="icon" type="image/x-icon" href="../../favicon.ico">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -60,34 +60,18 @@
             background-color: #0056b3;
         }
 
-        /* Adjust home-button styling if needed for standalone HTML */
-        /* If you don't have a fixed header or other pages yet, this button won't link anywhere meaningful */
-        .home-button {
-            position: fixed; /* Still fixed if you want it sticky */
-            top: 15px;
-            left: 15px;
-            font-size: 24px;
-            color: #87CEEB;
-            background-color: transparent;
-            padding: 10px;
-            border-radius: 5px;
-            text-decoration: none;
-            z-index: 1000;
-        }
-
-        .home-button:hover {
-            color: #4CAF50;
-            background-color: rgba(255, 255, 255, 0.1);
-            text-decoration: none;
-        }
-
         /* Add padding to body to prevent content from going under fixed button */
         body {
-            padding-top: 70px; /* Adjust based on home-button size */
             background-color: #333; /* Dark gray */
             color: #eee;          /* Default light text color for body */
             font-family: 'Roboto', sans-serif;
             margin: 0; /* Remove default body margin */
+        }
+
+        h1 {
+            margin-top: 60px;
+            text-align: center;
+            color: #eee;
         }
     </style>
 </head>
