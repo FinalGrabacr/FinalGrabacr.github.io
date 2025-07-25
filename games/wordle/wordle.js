@@ -1,6 +1,6 @@
 class Wordle {
     constructor(config) {
-
+        // Your word list is now directly embedded
         this.wordList = [
             "apple", "baker", "crane", "doubt", "eagle", "faint", "grape", "house", "igloo", "jolly", "knife",
             "lemon", "mango", "night", "ocean", "pizza", "queen", "river", "sugar", "table", "union", "vowel",
