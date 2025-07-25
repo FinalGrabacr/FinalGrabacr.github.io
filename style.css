@@ -144,3 +144,62 @@ body {
     padding: 10px 12px;
   }
 }
+
+.games-grid {
+  display: grid;
+  /* This creates a responsive grid: min 200px wide columns, auto-fitting */
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 25px; /* Space between game cards */
+  padding: 20px;
+  max-width: 900px; /* Max width for the grid container */
+  margin: 40px auto; /* Center the grid */
+  justify-content: center; /* Center cards if they don't fill the grid */
+}
+
+.game-card {
+  display: flex; /* Use flexbox for vertical alignment of content */
+  flex-direction: column; /* Stack image and title vertically */
+  align-items: center; /* Center content horizontally within the card */
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden; /* Ensures image corners are rounded with card */
+  text-decoration: none; /* Remove underline from link */
+  color: #333; /* Default text color for the card */
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  padding-bottom: 15px; /* Padding below content in card */
+}
+
+.game-card:hover {
+  transform: translateY(-8px); /* Lift effect on hover */
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.game-card img {
+
+  width: 100%;
+  max-width: 250px;
+  height: auto;
+  display: block;
+  object-fit: cover;
+  border-radius: 10px 10px 0 0;
+  margin-bottom: 10px;
+}
+
+.game-title {
+  font-size: 1.2em;
+  font-weight: 700;
+  text-align: center;
+  padding: 0 10px;
+}
+
+
+@media (max-width: 600px) {
+  .games-grid {
+    grid-template-columns: 1fr;
+    padding: 15px;
+  }
+  .game-card img {
+    max-width: 100%;
+  }
+}
