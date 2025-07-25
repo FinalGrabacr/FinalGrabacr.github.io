@@ -157,11 +157,17 @@ class Wordle {
         }
     }
 
-    // --- You will implement these core Wordle functions ---
     updateGridDisplay(guess) {
-        // This function will take the 'guess' string and update the text content
-        // of the cells in the current row (this.gameGrid.children[this.currentRow].children)
-        console.log(`Updating grid for guess: ${guess}`);
+        const currentRowElement = this.gameGrid.children[this.currentRow];
+        if (currentRowElement) {
+            for (let i = 0; i < this.wordLength; i++) {
+                const cellElement = currentRowElement.children[i];
+                if (cellElement && guess[i]) { // Ensure cellElement and letter exist
+                    cellElement.textContent = guess[i].toUpperCase(); // Put the letter into the cell
+                }
+            }
+        }
+        console.log(`Updating grid for guess: ${guess}`); // Keep this for debugging if you want
     }
 
     checkLettersForColors(guess) {
@@ -173,6 +179,28 @@ class Wordle {
         // Then, it will add/remove CSS classes ('green', 'yellow', 'gray') to the
         // respective cells in the UI grid.
         console.log(`Checking colors for guess: ${guess} against secret word: ${this.currentWord}`);
+
+        const currentRowElement = this.gameGrid.children[this.currentRow];
+        for (let i = 0; i < this.wordLength; i++) {
+            const cellElement = currentRowElement.children[i]; // Get the specific cell div
+
+            // Example logic (you'll refine this):
+            let statusClass = '';
+            if (guess[i] === this.currentWord[i]) {
+                statusClass = 'correct';
+            } else if (this.currentWord.includes(guess[i])) {
+                statusClass = 'present';
+            } else {
+                statusClass = 'absent';
+            }
+
+            cellElement.classList.add(statusClass);
+
+            cellElement.classList.add('flipped');
+            cellElement.addEventListener('animationend', () => {
+            cellElement.classList.remove('flipped');
+            }, { once: true });
+        }
     }
 }
 
