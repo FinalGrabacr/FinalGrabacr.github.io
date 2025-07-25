@@ -171,13 +171,13 @@ body {
 }
 
 .game-card:hover {
-  transform: translateY(-8px); /* Lift effect on hover */
+  transform: translateY(-3px); /* Lift effect on hover */
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
 
 .game-card img {
 
-  width: 100%;
+  width: 50%;
   max-width: 250px;
   height: auto;
   display: block;
