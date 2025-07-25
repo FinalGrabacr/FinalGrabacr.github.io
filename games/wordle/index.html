@@ -9,7 +9,7 @@
     </style>
 </head>
 <body>
-<h1>Ghetto Wordle</h1>
+<h1>Wordle Clone</h1>
 <div id="game-area">
     <div id="game-grid">
     </div>
@@ -31,6 +31,8 @@
 
         const wordle = new Wordle(gameConfig);
 
+        // Since loadWords is now synchronous, we don't strictly need 'await' here
+        // but keeping it doesn't hurt and makes it consistent if you revert later.
         const wordsLoadedSuccessfully = await wordle.loadWords();
 
         if (wordsLoadedSuccessfully) {
