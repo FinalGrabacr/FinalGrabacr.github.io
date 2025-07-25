@@ -221,3 +221,36 @@ body {
     margin: 0 auto; /* Center individual cards on mobile */
   }
 }
+
+.wordle-cell.correct { /* Green for correct letter, correct position */
+  background-color: #6aaa64; /* A common Wordle green */
+  color: white;
+  border-color: #6aaa64;
+}
+
+.wordle-cell.present { /* Yellow for correct letter, wrong position */
+  background-color: #c9b458; /* A common Wordle yellow */
+  color: white;
+  border-color: #c9b458;
+}
+
+.wordle-cell.absent { /* Gray for letter not in the word */
+  background-color: #787c7e; /* A common Wordle gray */
+  color: white;
+  border-color: #787c7e;
+}
+
+/* Optional: Animation for flipping the tiles (makes it look nicer) */
+.wordle-cell.flipped {
+  animation: flip 0.5s ease forwards;
+}
+
+@keyframes flip {
+  0% { transform: rotateX(0deg); }
+  50% { transform: rotateX(90deg); background-color: #333; border-color: #333; }
+  100% { transform: rotateX(0deg); }
+}
+
+.wordle-cell {
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
