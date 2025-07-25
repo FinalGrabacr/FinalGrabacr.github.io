@@ -616,7 +616,7 @@ class Wordle {
                 const backspaceButton = document.createElement('button');
                 backspaceButton.innerHTML = backspaceIcon; // Use the SVG icon
                 backspaceButton.classList.add('keyboard-button', 'big-button');
-                backspaceButton.dataset.key = 'backspace';
+                backspaceButton.dataset.key = '⟵';
                 rowDiv.appendChild(backspaceButton);
             }
 
