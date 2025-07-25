@@ -5,7 +5,164 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wordle</title>
     <style>
-        /* ... All your CSS from the previous complete index.html ... */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start; /* Align content to the top */
+            min-height: 100vh; /* Full viewport height */
+            background-color: #1a1a1b; /* Dark background similar to Wordle */
+            color: #d3d6da; /* Light gray text for contrast */
+            margin: 0;
+            padding: 20px; /* Add some padding around the content */
+            box-sizing: border-box; /* Include padding in element's total width and height */
+        }
+
+        h1 {
+            color: #d3d6da;
+            margin-bottom: 20px;
+        }
+
+        #game-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%; /* Take full width */
+            max-width: 500px; /* Max width for the game area */
+            margin-bottom: 20px; /* Space between game and keyboard */
+        }
+
+        #game-grid {
+            display: grid;
+            grid-template-rows: repeat(6, 1fr); /* 6 rows for guesses */
+            gap: 5px; /* Space between rows */
+            width: 100%;
+            padding: 10px; /* Padding inside the grid container */
+            box-sizing: border-box;
+        }
+
+        .grid-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr); /* 5 columns for letters */
+            gap: 5px; /* Space between cells */
+            width: 100%;
+        }
+
+        .grid-cell {
+            width: 100%;
+            padding-bottom: 100%; /* Makes cells square based on width */
+            position: relative;
+            background-color: #3a3a3c; /* Default cell background (dark gray) */
+            border: 2px solid #3a3a3c; /* Default border */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            font-weight: bold;
+            text-transform: uppercase;
+            box-sizing: border-box;
+            color: #d3d6da;
+            transition: background-color 0.6s ease-out, border-color 0.6s ease-out; /* Smooth transition for colors */
+        }
+
+        .grid-cell span {
+            position: absolute; /* Center content within padded cell */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Cell result colors */
+        .correct {
+            background-color: #538d4e; /* Green */
+            border-color: #538d4e;
+        }
+
+        .present {
+            background-color: #b59f3b; /* Yellow/Orange */
+            border-color: #b59f3b;
+        }
+
+        .absent {
+            background-color: #3a3a3c; /* Dark gray (default for absent) */
+            border-color: #3a3a3c;
+        }
+
+        #message-display {
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            min-height: 1.5em; /* Reserve space for messages */
+            color: #d3d6da; /* Default message color */
+        }
+
+        #keyboard {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px; /* Space between keyboard rows */
+            width: 100%;
+            max-width: 600px; /* Adjust as needed */
+            margin-top: 20px;
+        }
+
+        .keyboard-row {
+            display: flex;
+            justify-content: center;
+            gap: 6px; /* Space between keys in a row */
+            width: 100%;
+        }
+
+        .keyboard-button {
+            background-color: #818384; /* Key background (gray) */
+            color: #d3d6da; /* Key text color */
+            border: none;
+            border-radius: 4px;
+            padding: 15px 10px; /* Adjust padding for key size */
+            font-size: 1.1em;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            flex-grow: 1; /* Keys in a row will grow to fill space */
+            flex-basis: 0; /* Base size for flex-grow */
+            min-width: 30px; /* Minimum width for small keys */
+            height: 58px; /* Fixed height for consistency */
+            display: flex; /* For centering text */
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s ease;
+        }
+
+        .keyboard-button:hover {
+            background-color: #929394; /* Lighter gray on hover */
+        }
+
+        .keyboard-button:active {
+            background-color: #6d6e6f; /* Even darker on active */
+        }
+
+        .big-button {
+            flex-grow: 1.5; /* Enter and Backspace can be wider */
+            min-width: 60px; /* Minimum width for big buttons */
+            font-size: 0.9em; /* Slightly smaller text for big buttons */
+        }
+
+        /* Keyboard key colors based on guess results */
+        .keyboard-button[data-state="correct"] {
+            background-color: #538d4e; /* Green */
+            color: #ffffff; /* White text */
+        }
+
+        .keyboard-button[data-state="present"] {
+            background-color: #b59f3b; /* Yellow */
+            color: #ffffff;
+        }
+
+        .keyboard-button[data-state="absent"] {
+            background-color: #3a3a3c; /* Dark gray */
+            color: #ffffff;
+        }
     </style>
 </head>
 <body>
@@ -24,21 +181,21 @@
 <script>
     document.addEventListener('DOMContentLoaded', async () => {
         const gameConfig = {
-            // wordListPath: 'words.txt', // This line is no longer needed
+            // wordListPath: 'words.txt', // This line is no longer needed after embedding word list
             wordLength: 5,
             maxGuesses: 6
         };
 
         const wordle = new Wordle(gameConfig);
 
-        // Since loadWords is now synchronous, we don't strictly need 'await' here
-        // but keeping it doesn't hurt and makes it consistent if you revert later.
+        // Since loadWords is now synchronous due to embedded list, 'await' is technically not strictly required
+        // but keeping it doesn't hurt and allows for easy reversion if you go back to fetching.
         const wordsLoadedSuccessfully = await wordle.loadWords();
 
         if (wordsLoadedSuccessfully) {
             wordle.initializeGame();
         } else {
-            // This error path should theoretically not be hit if words are embedded
+            // This path should ideally not be hit if the word list is embedded
             console.error("Game cannot start because word list failed to load.");
         }
     });

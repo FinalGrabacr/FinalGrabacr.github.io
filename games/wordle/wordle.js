@@ -324,7 +324,7 @@ class Wordle {
             "surge", "surer", "surly", "sushi", "swabs", "swags", "swami", "swamp", "swank", "swans", "swaps",
             "swarm", "swash", "swats", "sways", "swear", "sweat", "sweep", "sweet", "swell", "swept", "swift",
             "swigs", "swill", "swims", "swine", "swing", "swirl", "swish", "swoon", "swoop", "sword", "swore",
-            "sworn", "swung", "sylph", "synch", "syncs", "syrup", "tabby", "table", "taboo", "tacit", "tacks",
+            "sworn", "swung", "sylph", "synch", "synks", "syrup", "tabby", "table", "taboo", "tacit", "tacks",
             "tacky", "tails", "taint", "taken", "taker", "takes", "talcs", "talks", "tally", "talon", "tamed",
             "tamer", "tames", "tango", "tangs", "tangy", "tanks", "taper", "tapes", "tardy", "tarot", "tarps",
             "tarry", "tarts", "tased", "tases", "taste", "tasty", "tater", "tatts", "taunt", "taupe", "tawny",
@@ -388,7 +388,7 @@ class Wordle {
         this.guesses = [];
         this.currentRow = 0;
         this.gameOver = false;
-        // this.wordListPath = config.wordListPath; // No longer needed
+        // this.wordListPath = config.wordListPath; // Removed as words are embedded
         this.wordLength = config.wordLength || 5;
         this.maxGuesses = config.maxGuesses || 6;
 
@@ -406,7 +406,6 @@ class Wordle {
         document.addEventListener('keydown', this.handlePhysicalKeyPress.bind(this));
     }
 
-    // The loadWords method is now simplified as the list is pre-loaded
     async loadWords() {
         // With the word list embedded, we just need to ensure it's ready.
         // The filter for wordLength happens in the constructor's definition for wordList.
@@ -419,7 +418,7 @@ class Wordle {
 
     pickRandomWord() {
         if (this.wordList.length === 0) {
-            console.error("Word list is empty or not loaded. Cannot pick random word.");
+            this.displayMessage("Error: No words loaded to pick from!", true);
             return null;
         }
         const randomIndex = Math.floor(Math.random() * this.wordList.length);
@@ -427,173 +426,137 @@ class Wordle {
     }
 
     initializeGame() {
-        if (this.wordList.length === 0) {
-            console.error("Attempted to initialize game before word list was loaded.");
+        this.currentWord = this.pickRandomWord();
+        if (!this.currentWord) {
+            console.error("Failed to pick a word. Game cannot start.");
             return;
         }
-        this.currentWord = this.pickRandomWord();
-        // REMOVE THIS LINE LATER FOR REAL GAMEPLAY! It's for debugging.
-        console.log("The secret word is:", this.currentWord);
-
-        this.guesses = Array(this.maxGuesses).fill(''); // Each element will be the current guess string
+        console.log("Secret word (for debugging):", this.currentWord); // For debugging
+        this.guesses = Array(this.maxGuesses).fill(null).map(() => Array(this.wordLength).fill(''));
         this.currentRow = 0;
         this.gameOver = false;
-
-        if (this.messageDisplay) this.messageDisplay.textContent = '';
+        this.messageDisplay.textContent = ''; // Clear any previous messages
+        this.resetLetterStates();
         this.createGameGrid();
-        this.createKeyboard(); // Create the on-screen keyboard
-        this.resetLetterStates(); // Reset keyboard letter colors for a new game
+        this.createKeyboard();
+        // Focus the input if it were visible, but it's hidden now.
+        // this.guessInput.focus();
     }
 
-    // --- Unified Key Press Handler (physical and on-screen) ---
     handleKeyPress(key) {
         if (this.gameOver) return;
 
-        // Get the current row's cells for visual updates
-        const currentRowCells = this.gameGrid.children[this.currentRow]?.children;
-        if (!currentRowCells) {
-            console.warn("Current row cells not found.");
-            return;
-        }
-        let currentGuess = this.guesses[this.currentRow]; // Get the current string guess for this row
+        const currentGuess = this.guesses[this.currentRow];
+        const currentGuessString = currentGuess.join('');
+        const currentCellIndex = currentGuessString.length;
 
-        if (key === 'enter') {
-            if (currentGuess.length === this.wordLength) {
-                this.handleGuess(); // Process the complete guess
-            } else {
-                this.displayMessage(`Not enough letters!`, true); // Shake row if not full word
+        if (key === 'backspace') {
+            if (currentCellIndex > 0) {
+                currentGuess[currentCellIndex - 1] = '';
+                this.updateGridCell(this.currentRow, currentCellIndex - 1, '');
             }
-        } else if (key === 'backspace') {
-            if (currentGuess.length > 0) {
-                this.displayMessage(''); // Clear any previous error messages
-
-                // Update the guess string
-                currentGuess = currentGuess.slice(0, -1);
-                this.guesses[this.currentRow] = currentGuess;
-
-                // Clear the last letter in the UI
-                const lastCell = currentRowCells[currentGuess.length];
-                if (lastCell) {
-                    lastCell.textContent = '';
-                    lastCell.classList.remove('filled'); // Remove filled style
-                }
-            }
-        } else if (key.length === 1 && key.match(/[a-z]/i)) { // Check if it's a single letter (a-z)
-            if (currentGuess.length < this.wordLength) {
-                this.displayMessage(''); // Clear any previous error messages
-
-                // Append letter to the guess string
-                currentGuess += key.toLowerCase();
-                this.guesses[this.currentRow] = currentGuess;
-
-                // Display the letter in the current cell
-                const currentCell = currentRowCells[currentGuess.length - 1];
-                if (currentCell) {
-                    currentCell.textContent = key.toUpperCase();
-                    currentCell.classList.add('filled'); // Add a class for filled cell style
-                }
+        } else if (key === 'enter') {
+            this.handleGuess();
+        } else if (key.length === 1 && key.match(/[a-z]/i)) {
+            if (currentCellIndex < this.wordLength) {
+                currentGuess[currentCellIndex] = key.toLowerCase();
+                this.updateGridCell(this.currentRow, currentCellIndex, key.toLowerCase());
             }
         }
     }
 
-    // --- Physical Keyboard Input Handler ---
     handlePhysicalKeyPress(event) {
-        const key = event.key.toLowerCase();
-        // Prevent default browser behavior for Enter/Backspace if we handle them
-        if (key === 'enter' || key === 'backspace') {
+        // Prevent default behavior for some keys (e.g., spacebar scrolling)
+        if (event.key === 'Backspace' || event.key === 'Enter' || event.key.length === 1 && event.key.match(/[a-z]/i)) {
             event.preventDefault();
         }
-        this.handleKeyPress(key); // Pass to our unified handler
+        this.handleKeyPress(event.key.toLowerCase());
     }
 
-    // --- Main Guess Processing Logic (Called by handleKeyPress when 'Enter' is pressed) ---
     handleGuess() {
-        if (this.gameOver) return;
+        const currentGuessArray = this.guesses[this.currentRow];
+        const currentGuessString = currentGuessArray.join('');
 
-        const guess = this.guesses[this.currentRow];
-
-        // Ensure length validation (should be caught by handleKeyPress, but good to double check)
-        if (guess.length !== this.wordLength) {
-            this.displayMessage(`Not enough letters!`, true);
+        if (currentGuessString.length !== this.wordLength) {
+            this.displayMessage(`Guess must be ${this.wordLength} letters long!`, false);
             return;
         }
 
-        // Validate against the available dictionary
-        if (!this.wordList.includes(guess)) {
-            this.displayMessage(`"${guess.toUpperCase()}" is not in the word list.`, true); // Shake if not in dictionary
+        if (!this.wordList.includes(currentGuessString)) {
+            this.displayMessage("Not in word list!", false);
             return;
         }
 
-        this.displayMessage(''); // Clear any previous messages
+        this.displayMessage(""); // Clear previous messages
+        const letterColors = this.checkLettersForColors(currentGuessString);
+        this.updateKeyboardColors(letterColors); // Update keyboard
+        this.applyColorsToGrid(this.currentRow, letterColors); // Apply colors to current row
 
-        this.checkLettersForColors(guess); // Apply colors to grid cells and update keyboard states
-
-        // Check for win condition
-        if (guess === this.currentWord) {
-            this.displayMessage('You guessed it! 🎉', false); // No shake on win
+        if (currentGuessString === this.currentWord) {
+            this.displayMessage("You guessed the word!", true);
             this.gameOver = true;
-            // Optionally add a win animation here
-            return;
-        }
-
-        // Check for loss condition
-        if (this.currentRow >= this.maxGuesses - 1) { // -1 because currentRow is 0-indexed
-            this.displayMessage(`Game Over! The word was ${this.currentWord.toUpperCase()}.`, false); // No shake on loss
+        } else if (this.currentRow >= this.maxGuesses - 1) {
+            this.displayMessage(`Game Over! The word was ${this.currentWord.toUpperCase()}`, true);
             this.gameOver = true;
-            return;
-        }
-
-        this.currentRow++; // Move to the next row for the next guess
-        this.guesses[this.currentRow] = ''; // Initialize the next row's guess string
-    }
-
-    displayMessage(message, shake = false) {
-        if (this.messageDisplay) {
-            this.messageDisplay.textContent = message;
-            this.messageDisplay.style.color = shake ? 'orange' : '#4CAF50'; // Red/orange for errors, green for success
-
-            // Set a timeout to clear message after a few seconds if it's an error/warning
-            if (shake || message.length > 0 && !this.gameOver) {
-                clearTimeout(this.messageTimeout); // Clear previous timeout
-                this.messageTimeout = setTimeout(() => {
-                    if (!this.gameOver) { // Don't clear if game is over (win/loss message)
-                        this.messageDisplay.textContent = '';
-                    }
-                }, 2000); // Message disappears after 2 seconds
-            }
-        }
-        if (shake) {
-            const currentRowElement = this.gameGrid?.children[this.currentRow];
-
-            if (currentRowElement) {
-                currentRowElement.classList.add('shake');
-                currentRowElement.addEventListener('animationend', () => {
-                    currentRowElement.classList.remove('shake');
-                }, { once: true });
-            }
+        } else {
+            this.currentRow++;
         }
     }
 
-    // --- Grid Creation (no change) ---
+    displayMessage(message, isFinal = false) {
+        this.messageDisplay.textContent = message;
+        if (isFinal) {
+            this.messageDisplay.style.color = '#538d4e'; // Green for win/loss
+        } else {
+            this.messageDisplay.style.color = '#d3d6da'; // Default light gray
+        }
+    }
+
     createGameGrid() {
         if (!this.gameGrid) {
-            console.warn("Game grid element not found. Cannot create grid.");
+            console.error("Game grid element not found. Cannot create grid.");
             return;
         }
-        this.gameGrid.innerHTML = ''; // Clear existing grid
+        this.gameGrid.innerHTML = ''; // Clear any existing grid
+
         for (let i = 0; i < this.maxGuesses; i++) {
-            const row = document.createElement('div');
-            row.classList.add('wordle-row');
+            const rowDiv = document.createElement('div');
+            rowDiv.classList.add('grid-row');
             for (let j = 0; j < this.wordLength; j++) {
-                const cell = document.createElement('div');
-                cell.classList.add('wordle-cell');
-                row.appendChild(cell);
+                const cellDiv = document.createElement('div');
+                cellDiv.classList.add('grid-cell');
+                const span = document.createElement('span'); // Span for text centering
+                cellDiv.appendChild(span);
+                rowDiv.appendChild(cellDiv);
             }
-            this.gameGrid.appendChild(row);
+            this.gameGrid.appendChild(rowDiv);
         }
     }
 
-    // --- Keyboard Creation ---
+    updateGridCell(row, col, letter) {
+        const rowElement = this.gameGrid.children[row];
+        if (rowElement) {
+            const cellElement = rowElement.children[col];
+            if (cellElement) {
+                cellElement.querySelector('span').textContent = letter.toUpperCase();
+            }
+        }
+    }
+
+    applyColorsToGrid(row, letterColors) {
+        const rowElement = this.gameGrid.children[row];
+        if (rowElement) {
+            const cells = rowElement.children;
+            letterColors.forEach((lc, index) => {
+                const cell = cells[index];
+                // Remove previous state classes, if any
+                cell.classList.remove('correct', 'present', 'absent');
+                // Add the new state class
+                cell.classList.add(lc.state);
+            });
+        }
+    }
+
     createKeyboard() {
         if (!this.keyboardContainer) {
             console.warn("Keyboard container element not found. Cannot create keyboard.");
@@ -615,7 +578,7 @@ class Wordle {
             // Add Enter button to the last row
             if (index === rows.length - 1) {
                 const enterButton = document.createElement('button');
-                enterButton.textContent = 'Enter';
+                enterButton.textContent = 'ENTER'; // Text, not icon
                 enterButton.classList.add('keyboard-button', 'big-button');
                 enterButton.dataset.key = 'enter';
                 rowDiv.appendChild(enterButton);
@@ -633,7 +596,7 @@ class Wordle {
             // Add Backspace button to the last row
             if (index === rows.length - 1) {
                 const backspaceButton = document.createElement('button');
-                backspaceButton.textContent = 'Backspace';
+                backspaceButton.textContent = 'BACKSPACE'; // Text, not icon
                 backspaceButton.classList.add('keyboard-button', 'big-button');
                 backspaceButton.dataset.key = 'backspace';
                 rowDiv.appendChild(backspaceButton);
@@ -645,124 +608,83 @@ class Wordle {
         // Add event listener to the keyboard container (event delegation)
         this.keyboardContainer.addEventListener('click', (event) => {
             const target = event.target;
-            // Check if the clicked element is a keyboard-button (or a child of one)
-            const button = target.closest('.keyboard-button');
-            if (button) {
-                const key = button.dataset.key;
+            // Check if the clicked element is a keyboard-button
+            if (target.classList.contains('keyboard-button')) {
+                const key = target.dataset.key;
                 this.handleKeyPress(key); // Call the unified handler
             }
         });
     }
 
-    // --- Reset letter states for a new game ---
     resetLetterStates() {
-        this.letterStates = {};
-        const alphabet = 'abcdefghijklmnopqrstuvwxyz';
-        for (const char of alphabet) {
-            this.letterStates[char] = 'default'; // 'default', 'absent', 'present', 'correct'
-        }
-        this.updateKeyboardColors(); // Apply the default colors to the keyboard
-    }
-
-    // --- Update keyboard key colors based on letterStates ---
-    updateKeyboardColors() {
-        if (!this.keyboardContainer) return;
-
-        this.keyboardContainer.querySelectorAll('.keyboard-button').forEach(button => {
-            const keyChar = button.dataset.key; // Get the letter from data-key
-
-            // Skip Enter/Backspace buttons when applying letter states
-            if (keyChar === 'enter' || keyChar === 'backspace' || !keyChar.match(/[a-z]/i)) {
-                return;
-            }
-
-            // Remove existing color classes
-            button.classList.remove('keyboard-correct', 'keyboard-present', 'keyboard-absent');
-
-            // Apply the new color class based on the letter's state
-            const state = this.letterStates[keyChar];
-            if (state && state !== 'default') {
-                button.classList.add(`keyboard-${state}`);
-            }
+        // Initialize all letters to an unknown state
+        'abcdefghijklmnopqrstuvwxyz'.split('').forEach(letter => {
+            this.letterStates[letter] = 'default';
+        });
+        // Reset keyboard button colors visually if they were previously set
+        document.querySelectorAll('.keyboard-button').forEach(button => {
+            button.removeAttribute('data-state');
         });
     }
 
-    /**
-     * Updates the state of a letter for the on-screen keyboard.
-     * Higher priority states (correct > present > absent) override lower ones.
-     * @param {string} letter The letter to update.
-     * @param {string} newState The new state ('correct', 'present', 'absent').
-     */
     updateLetterState(letter, newState) {
-        const currentState = this.letterStates[letter];
-
-        // Priority logic: correct > present > absent > default
-        if (newState === 'correct') {
-            this.letterStates[letter] = 'correct';
-        } else if (newState === 'present' && currentState !== 'correct') { // Only update to present if not already correct
-            this.letterStates[letter] = 'present';
-        } else if (newState === 'absent' && currentState !== 'correct' && currentState !== 'present') { // Only update to absent if not already correct or present
-            this.letterStates[letter] = 'absent';
+        // Only update if the new state is 'better' than the current one
+        // correct > present > absent > default
+        const precedence = { 'default': 0, 'absent': 1, 'present': 2, 'correct': 3 };
+        if (precedence[newState] > precedence[this.letterStates[letter]]) {
+            this.letterStates[letter] = newState;
         }
-        // If newState is default, it only applies if current is also default (implicitly handled)
     }
 
-    // --- Core Wordle Logic: Check letters for colors and update keyboard state ---
+    updateKeyboardColors(letterColors) {
+        letterColors.forEach(lc => {
+            this.updateLetterState(lc.letter, lc.state);
+        });
+
+        for (const letter in this.letterStates) {
+            const state = this.letterStates[letter];
+            const button = this.keyboardContainer.querySelector(`button[data-key="${letter}"]`);
+            if (button) {
+                button.setAttribute('data-state', state);
+            }
+        }
+    }
+
     checkLettersForColors(guess) {
-        const currentRowElement = this.gameGrid.children[this.currentRow];
-        const currentWordLetters = this.currentWord.split('');
+        const colors = Array(this.wordLength).fill({ letter: '', state: '' });
+        const targetWordLetters = this.currentWord.split('');
         const guessLetters = guess.split('');
 
-        // Track which letters in the secret word have been "consumed" by a match
-        const secretWordConsumed = new Array(this.wordLength).fill(false);
-        // Track which letters in the guess have been processed (for green/yellow)
-        const guessProcessed = new Array(this.wordLength).fill(false);
+        // Create a frequency map of letters in the currentWord
+        const targetLetterCounts = {};
+        for (const char of targetWordLetters) {
+            targetLetterCounts[char] = (targetLetterCounts[char] || 0) + 1;
+        }
 
-        // First pass: Identify 'correct' (green) letters
+        // First pass: Mark correct letters (green)
         for (let i = 0; i < this.wordLength; i++) {
-            const cellElement = currentRowElement.children[i];
-            if (guessLetters[i] === currentWordLetters[i]) {
-                cellElement.classList.add('correct');
-                this.updateLetterState(guessLetters[i], 'correct');
-                secretWordConsumed[i] = true;
-                guessProcessed[i] = true;
+            if (guessLetters[i] === targetWordLetters[i]) {
+                colors[i] = { letter: guessLetters[i], state: 'correct' };
+                targetLetterCounts[guessLetters[i]]--; // Decrement count for matched letter
             }
         }
 
-        // Second pass: Identify 'present' (yellow) and 'absent' (gray) letters
+        // Second pass: Mark present (yellow) and absent (dark gray)
         for (let i = 0; i < this.wordLength; i++) {
-            const cellElement = currentRowElement.children[i];
-            if (guessProcessed[i]) {
-                // This letter was already handled as 'correct' in the first pass
+            // If already marked correct, skip
+            if (colors[i].state === 'correct') {
                 continue;
             }
 
-            let statusClass = 'absent'; // Default to absent
-            let foundPresent = false;
-
-            // Check if the letter exists anywhere in the secret word, not already consumed
-            for (let j = 0; j < this.wordLength; j++) {
-                if (!secretWordConsumed[j] && guessLetters[i] === currentWordLetters[j]) {
-                    statusClass = 'present';
-                    secretWordConsumed[j] = true; // Consume this letter in the secret word
-                    foundPresent = true;
-                    break; // Found a match, move to the next letter in the guess
-                }
+            const guessLetter = guessLetters[i];
+            if (targetWordLetters.includes(guessLetter) && targetLetterCounts[guessLetter] > 0) {
+                colors[i] = { letter: guessLetter, state: 'present' };
+                targetLetterCounts[guessLetter]--; // Decrement count for matched letter
+            } else {
+                colors[i] = { letter: guessLetter, state: 'absent' };
             }
-
-            cellElement.classList.add(statusClass);
-            this.updateLetterState(guessLetters[i], statusClass);
         }
 
-        // Apply flip animation to all cells in the current row after all colors are determined
-        Array.from(currentRowElement.children).forEach(cell => {
-            cell.classList.add('flipped');
-            cell.addEventListener('animationend', () => {
-                cell.classList.remove('flipped');
-            }, { once: true });
-        });
-
-        // Update keyboard colors after processing all letters in the guess
-        this.updateKeyboardColors();
+        return colors;
     }
 }
