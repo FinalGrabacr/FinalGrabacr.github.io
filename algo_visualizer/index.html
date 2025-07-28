@@ -3,19 +3,59 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Algorithms and visualizers</title> <link rel="icon" type="image/x-icon" href="../favicon.ico">
+  <title>Algorithm visualizer</title> <link rel="icon" type="image/x-icon" href="../favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="../style.css">
+
+  <style>
+    /* Base styles - using Tailwind for utility, then custom for specifics */
+    body {
+      font-family: 'Inter', sans-serif;
+      /* Tailwind classes for basic layout and dark theme */
+      @apply bg-gray-900 text-gray-100 flex justify-center items-center min-h-screen p-4;
+    }
+
+    /* Main container for the entire visualizer */
+    #visualizer-container {
+      /* Tailwind classes for styling the container box */
+      @apply bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-4xl;
+    }
+
+    /* Area where the array bars will be displayed */
+    #array-display {
+      /* Tailwind classes for the display area */
+      @apply flex items-end justify-center w-full bg-gray-700 rounded-md p-2;
+      min-height: 250px; /* Essential: Give the display area a visible height */
+      border: 1px solid #4a5568; /* A subtle border */
+    }
+
+    /* Responsive adjustments for smaller screens */
+    @media (max-width: 768px) {
+      #visualizer-container {
+        @apply p-4; /* Reduce padding on small screens */
+      }
+      #array-display {
+        min-height: 200px; /* Slightly smaller height on mobile */
+      }
+    }
+  </style>
 </head>
 <body>
 
   <div id="header-placeholder"></div>
   <div class="content">
-    <h1>Algorithms</h1>
+    <div id="visualizer-container">
+      <h1 class="text-3xl font-bold text-gray-100 mb-6 text-center">Algorithm Visualizer</h1>
 
+      <div id="array-display">
+        <!-- This is where the bars will appear in the next phase -->
+      </div>
+
+      <!-- Controls and buttons will be added in later phases -->
+    </div>
 
   </div>
   <script src="../js/loadHeader.js" defer></script>
