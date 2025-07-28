@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Code Snippets</title>
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js" defer></script>
+    <style>
+        .snippet-container {
+            max-width: 1000px;
+            margin: 10px auto 0 auto;
+            padding: 10px 20px;
+        }
+
+        .snippet-filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        #snippetList {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive columns */
+            gap: 20px;
+        }
+
+        .snippet-card {
+            background-color: #222;
+            color: #eee;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .snippet-card h3 {
+            margin: 0 0 10px;
+        }
+
+        .snippet-meta {
+            font-size: 0.9em;
+            color: #aaa;
+            margin-bottom: 10px;
+        }
+
+        .copy-btn {
+            background-color: #444;
+            border: none;
+            color: #87CEEB;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .copy-btn:hover {
+            background-color: #555;
+            color: white;
+        }
+
+        .filter-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            background: #444;
+            color: #eee;
+            cursor: pointer;
+        }
+
+        .filter-btn.active {
+            background: #87CEEB;
+            color: #222;
+            font-weight: bold;
+        }
+
+        pre {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+<!-- Main navigation -->
+<nav class="main-nav">
+    <a href="../index.html" class="nav-button">Home</a>
+    <a href="../files/index.html" class="nav-button">Files</a>
+    <a href="../games/index.html" class="nav-button">Games</a>
+    <a href="../algo_visualizer/index.html" class="nav-button">Algorithms</a>
+    <a href="index.html" class="nav-button">Snippets</a>
+    <a href="../about/index.html" class="nav-button">About</a>
+</nav>
+
+<div class="snippet-container">
+    <h2>Code Snippet Library</h2>
+    <div class="snippet-filters" id="filterButtons"></div>
+    <div id="snippetList"></div>
+</div>
+
+<script>
+    const snippets = [
+        {
+            title: "Binary Search",
+            language: "Python",
+            description: "Classic recursive binary search on sorted arrays.",
+            code: `def binary_search(arr, target):\n    low, high = 0, len(arr) - 1\n    while low <= high:\n        mid = (low + high) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            low = mid + 1\n        else:\n            high = mid - 1\n    return -1`
+        },
+        {
+            title: "Disjoint Set Union (DSU)",
+            language: "C++",
+            description: "Efficient union-find data structure with path compression.",
+            code: `int parent[1000];\n\nint find(int x) {\n    if (parent[x] != x)\n        parent[x] = find(parent[x]);\n    return parent[x];\n}\n\nvoid union_sets(int a, int b) {\n    a = find(a);\n    b = find(b);\n    if (a != b)\n        parent[b] = a;\n}`
+        },
+        {
+            title: "DFS (Recursive)",
+            language: "JavaScript",
+            description: "Simple recursive depth-first search traversal.",
+            code: `function dfs(node, visited = new Set()) {\n    if (visited.has(node)) return;\n    visited.add(node);\n    console.log(node);\n    for (let neighbor of node.neighbors) {\n        dfs(neighbor, visited);\n    }\n}`
+        }
+    ];
+
+    const snippetList = document.getElementById("snippetList");
+    const filterButtons = document.getElementById("filterButtons");
+
+    function renderSnippets(lang = "All") {
+        snippetList.innerHTML = "";
+        snippets
+            .filter(snippet => lang === "All" || snippet.language === lang)
+            .forEach(snippet => {
+                const card = document.createElement("div");
+                card.className = "snippet-card";
+
+                card.innerHTML = `
+            <h3>${snippet.title}</h3>
+            <div class="snippet-meta">${snippet.language} | ${snippet.description}</div>
+            <pre><code class="language-${snippet.language.toLowerCase()}">${Prism.highlight(snippet.code, Prism.languages[snippet.language.toLowerCase()], snippet.language.toLowerCase())}</code></pre>
+            <button class="copy-btn" onclick="copyToClipboard(\`${snippet.code.replace(/`/g, '\\`')}\`)">Copy</button>
+          `;
+
+                snippetList.appendChild(card);
+            });
+    }
+
+    function renderFilterButtons() {
+        const langs = ["All", ...new Set(snippets.map(s => s.language))];
+        langs.forEach(lang => {
+            const btn = document.createElement("button");
+            btn.textContent = lang;
+            btn.className = "filter-btn";
+            if (lang === "All") btn.classList.add("active");
+            btn.addEventListener("click", () => {
+                document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                renderSnippets(lang);
+            });
+            filterButtons.appendChild(btn);
+        });
+    }
+
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            alert("Code copied to clipboard!");
+        });
+    }
+
+    renderFilterButtons();
+    renderSnippets();
+</script>
+</body>
+</html>
