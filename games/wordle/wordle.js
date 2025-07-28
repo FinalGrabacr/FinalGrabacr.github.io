@@ -442,20 +442,25 @@ class Wordle {
         if (this.gameOver) return;
 
         const currentGuess = this.guesses[this.currentRow];
-        const currentGuessString = currentGuess.join('');
-        const currentCellIndex = currentGuessString.length;
+        let currentCellIndex = currentGuess.findIndex(char => char === ''); // Find the first empty spot
+
+        // If no empty spot, it means the row is full. For backspace, we need the last filled spot.
+        if (currentCellIndex === -1) {
+            currentCellIndex = this.wordLength; // Points to the position *after* the last letter
+        }
 
         if (key === 'backspace') {
             if (currentCellIndex > 0) {
-                currentGuess[currentCellIndex - 1] = '';
-                this.updateGridCell(this.currentRow, currentCellIndex - 1, '', false); // Remove letter, remove filled class
+                const prevCellIndex = currentCellIndex - 1;
+                currentGuess[prevCellIndex] = ''; // Clear the letter in the array
+                this.updateGridCell(this.currentRow, prevCellIndex, '', false); // Update the visual cell and remove 'filled' class
             }
         } else if (key === 'enter') {
             this.handleGuess();
         } else if (key.length === 1 && key.match(/[a-z]/i)) {
             if (currentCellIndex < this.wordLength) {
                 currentGuess[currentCellIndex] = key.toLowerCase();
-                this.updateGridCell(this.currentRow, currentCellIndex, key.toLowerCase(), true); // Add letter, add filled class
+                this.updateGridCell(this.currentRow, currentCellIndex, key.toLowerCase(), true);
             }
         }
     }
