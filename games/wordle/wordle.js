@@ -439,6 +439,10 @@ class Wordle {
     }
 
     handleKeyPress(key) {
+        // --- DEBUGGING LOG ---
+        console.log('handleKeyPress called with key:', key);
+        // --- END DEBUGGING LOG ---
+
         if (this.gameOver) return;
 
         const currentGuess = this.guesses[this.currentRow];
@@ -585,13 +589,13 @@ class Wordle {
             <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
                 <path fill="currentColor" d="M19 7v4H5.83l3.58-3.59L8 6l-6 6 6 6 1.41-1.41L5.83 13H21V7z"/>
             </svg>
-        `; // Material Design "reply" icon, commonly used for enter
+        `;
 
         const backspaceIcon = `
             <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
                 <path fill="currentColor" d="M22 3H7c-.69 0-1.23.35-1.59.88L1 12l4.41 8.12c.36.53.9.88 1.59.88h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-3 12.59L17.59 14 14 10.41 10.41 14 9 12.59 12.59 9 9 5.41 10.41 4 14 7.59 17.59 4 19 5.41 15.41 9 19 12.59z"/>
             </svg>
-        `; // Material Design "backspace" icon
+        `;
 
 
         rows.forEach((rowLetters, index) => {
@@ -601,7 +605,7 @@ class Wordle {
             // Add Enter button to the last row
             if (index === rows.length - 1) {
                 const enterButton = document.createElement('button');
-                enterButton.innerHTML = enterIcon; // Use the SVG icon
+                enterButton.innerHTML = enterIcon;
                 enterButton.classList.add('keyboard-button', 'big-button');
                 enterButton.dataset.key = 'enter';
                 rowDiv.appendChild(enterButton);
@@ -619,9 +623,9 @@ class Wordle {
             // Add Backspace button to the last row
             if (index === rows.length - 1) {
                 const backspaceButton = document.createElement('button');
-                backspaceButton.innerHTML = backspaceIcon; // Use the SVG icon
+                backspaceButton.innerHTML = backspaceIcon;
                 backspaceButton.classList.add('keyboard-button', 'big-button');
-                backspaceButton.dataset.key = '⟵';
+                backspaceButton.dataset.key = 'backspace';
                 rowDiv.appendChild(backspaceButton);
             }
 
@@ -635,7 +639,13 @@ class Wordle {
             const button = target.closest('.keyboard-button');
             if (button) {
                 const key = button.dataset.key;
-                this.handleKeyPress(key); // Call the unified handler
+                // --- DEBUGGING LOGS ---
+                console.log('Keyboard button clicked. event.target:', target);
+                console.log('Found button:', button, 'Data-key:', key);
+                // --- END DEBUGGING LOGS ---
+                this.handleKeyPress(key);
+            } else {
+                console.log('Click on keyboard area, but no button found from target:', target);
             }
         });
     }
